@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine Gift for You ❤️</title>
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Georgia', serif; }
+  
+  body {
+    height: 100vh;
+    background: radial-gradient(circle, #8e0e0e 0%, #310000 100%);
+    overflow: hidden;
+    display: flex; justify-content: center; align-items: flex-end; 
+    padding-bottom: 100px;
+  }
+
+  /* Overlay Awal */
+  #overlay {
+    position: fixed; inset: 0; background: #5c0a0a; z-index: 2000;
+    display: flex; justify-content: center; align-items: center;
+    transition: opacity 0.8s ease;
+  }
+  
+  #startBtn {
+    padding: 15px 30px; background: #e74c3c; color: white;
+    border: none; border-radius: 50px; cursor: pointer; font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4); font-size: 1.1rem;
+  }
+
+  /* KOTAK HADIAH */
+  .box-container { 
+    position: relative; 
+    width: 160px; height: 160px; 
+    display: none; z-index: 10; 
+  }
+  
+  .box-bottom {
+    position: absolute; bottom: 0; width: 100%; height: 90px;
+    background: #c0392b; 
+    background-image: linear-gradient(90deg, transparent 45%, #f1c40f 48%, #f1c40f 52%, transparent 55%);
+    border-radius: 0 0 10px 10px; z-index: 10;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+
+  .box-lid {
+    position: absolute; bottom: 85px; left: -5px; width: 170px; height: 30px;
+    background: #e74c3c; border-radius: 5px; z-index: 50; transition: all 0.8s ease;
+  }
+  
+  .box-lid::before {
+    content: ''; position: absolute; left: 50%; transform: translateX(-50%);
+    width: 25px; height: 100%; background: #f1c40f;
+  }
+
+  .bow {
+    position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+    width: 40px; height: 20px; z-index: 60;
+  }
+  .bow::before, .bow::after {
+    content: ''; position: absolute; width: 20px; height: 20px;
+    background: #f1c40f; border-radius: 50% 50% 0 50%; transform: rotate(45deg);
+  }
+  .bow::after { left: 20px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); }
+
+  .box-lid.open { transform: translateY(-150px) rotate(-35deg); opacity: 0; }
+
+  /* ELEMEN TERBANG (BALON & BUNGA) */
+  .floating-item {
+    position: absolute; bottom: 50px; left: 50%;
+    pointer-events: none; z-index: 5;
+    animation: flyUp var(--duration) ease-out forwards;
+  }
+
+  @keyframes flyUp {
+    0% { transform: translate(-50%, 0) scale(0.5) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    100% { 
+      transform: translate(var(--x-end), -100vh) scale(var(--scale)) rotate(var(--rot)); 
+      opacity: 0;
+    }
+  }
+
+  /* FOTO */
+  .photo {
+    position: absolute; left: 50%; bottom: 40px; width: 130px;
+    padding: 8px 8px 25px 8px; background: white; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    transform: translate(-50%, 0) scale(0); opacity: 0; z-index: 20;
+    transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .photo.show { opacity: 1; transform: translate(-50%, -160px) scale(1) rotate(-5deg); }
+  .photo img { width: 100%; border-radius: 2px; }
+
+  /* SURAT */
+  .letter-wrapper {
+    position: fixed; left: 50%; bottom: 120px; 
+    transform: translate(-50%, 0) scale(0); opacity: 0;
+    visibility: hidden; z-index: 100;
+    transition: all 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  
+  .letter-wrapper.active { 
+    visibility: visible; opacity: 1; 
+    bottom: 50%; transform: translate(-50%, 50%) scale(1); 
+  }
+
+  .letter-body {
+    position: relative; width: 300px; height: 120px; 
+    background: #fffdf5; transition: all 1s ease-in-out;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.4); border-radius: 5px;
+    overflow: hidden; border: 1px solid #eee;
+    display: flex; flex-direction: column;
+  }
+
+  .letter-wrapper.open .letter-body { height: 450px; transform: translateY(-30px); }
+
+  .letter-content {
+    opacity: 0; transition: opacity 0.5s ease 0.7s; 
+    padding: 25px 15px; overflow-y: auto; height: 100%;
+  }
+  .letter-wrapper.open .letter-content { opacity: 1; }
+  .letter-body::after {
+    content: "Klik untuk Baca ❤️"; position: absolute; top: 40%; left: 0; width: 100%;
+    text-align: center; color: #c0392b; font-weight: bold;
+  }
+  .letter-wrapper.open .letter-body::after { opacity: 0; }
+
+  .main-action-btn {
+    position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+    padding: 12px 35px; background: white; color: #c0392b;
+    border: none; border-radius: 30px; font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 150; cursor: pointer;
+  }
+
+  .video-btn {
+    display: inline-block; margin-top: 20px; padding: 10px 20px;
+    background: #c0392b; color: white; border-radius: 20px;
+    font-size: 0.8rem; font-weight: bold; cursor: pointer;
+  }
+
+  .video-page {
+    position: fixed; inset: 0; background: #000;
+    display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 3000;
+  }
+  video { width: 90%; max-width: 360px; border-radius: 12px; }
+  .back-btn { margin-top: 20px; padding: 10px 20px; background: white; border:none; border-radius: 20px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<audio id="bgMusic" loop><source src="musik.mp3" type="audio/mpeg"></audio>
+
+<div id="overlay"><button id="startBtn">pencett cilll</button></div>
+
+<div class="box-container" id="mainScene">
+  <div id="spawnPoint"></div> <div class="photo" id="photo"><img src="pacar.jpg" alt="Foto"></div>
+
+  <div class="letter-wrapper" id="letterWrapper">
+    <div class="letter-body" onclick="openLetter()">
+      <div class="letter-content">
+        <h3 style="color:#c0392b; margin-bottom: 15px;">Happy Valentine!</h3>
+        <p style="font-size:0.9rem; line-height: 1.6; color: #444; text-align: left;">
+          happy valentine cill... <br><br>
+ga nyangka yaa kita udh selama inii, dari awal kita kenalan, terus sering berantem, putus nyambung nyaa, semoga kamu bisa liatt yaa disitu adalah bukti sayang kita dalam hubungan inii, cill selamat valentine yaa, selamat hari kasih sayang seduniaa, inget yaa cill sayang aku ke kamu itu setiap harii bukan hari doangg, ini hanya apresiasi kamu karna kita udh berhasil selama ini dan hari ini hanya jadi penanda, hari ini cuma pengingat kalau ada rasa yang setiap hari aku rawat yang tiap pagi aku bawa dalam doa yang tiap malam aku inget sebelum tidur, makasii udh mau nerima akuu sepenuhnya kalo ternyata banyak bangeett rasa sakitnya yaa, aku sayang kamuu cill sayangg kamuu setiap harii, semogaa kita bisa belajar sama sama terus yaa sampe dimana aku bener bener ga ada energi buat kenalan sama cowo lagii, dan begitupun kamuu, aku mau jadi org pertama dan terakhir yg kamu milikinn dann aku jga maunya gtu kamu adalah cowo terakhir yg aku pernah milikinn, kamu org baik dan cuman ada satu di dunia inii cill, aku jabanin dan ga ada yg bisa gantiin kamu di dalam hubungan inii, aku ngetik ini sambil nangis hehehe, aku sayang kamu cill loveee youu moree!!!)
+        </p>
+        <div class="video-btn" id="toVideo">Tonton Video 🎬</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="box-lid" id="lid"><div class="bow"></div></div>
+  <div class="box-bottom"></div>
+  <button class="main-action-btn" id="mainBtn">Buka Kotak</button>
+</div>
+
+<div class="video-page" id="videoPage">
+  <video id="vids" controls><source src="video.mp4" type="video/mp4"></video>
+  <button class="back-btn" id="backBtn">Kembali</button>
+</div>
+
+<script>
+  const music = document.getElementById("bgMusic");
+  const overlay = document.getElementById("overlay");
+  const mainScene = document.getElementById("mainScene");
+  const startBtn = document.getElementById("startBtn");
+  const spawnPoint = document.getElementById("spawnPoint");
+
+  startBtn.onclick = () => {
+    music.play();
+    overlay.style.opacity = "0";
+    setTimeout(() => { overlay.style.display = "none"; mainScene.style.display = "block"; }, 800);
+  };
+
+  function spawnItems() {
+    const items = ['🎈', '🌸', '🌹', '❤️', '✨'];
+    for (let i = 0; i < 40; i++) { // Jumlah item yang muncul
+      setTimeout(() => {
+        const item = document.createElement('div');
+        item.classList.add('floating-item');
+        item.innerHTML = items[Math.floor(Math.random() * items.length)];
+        
+        // Randomize posisi dan animasi
+        const xEnd = (Math.random() - 0.5) * 400; // Sebaran ke samping
+        const duration = 2 + Math.random() * 3; // Kecepatan terbang
+        const scale = 0.8 + Math.random() * 1.5;
+        const rot = (Math.random() - 0.5) * 200;
+
+        item.style.setProperty('--x-end', `${xEnd}px`);
+        item.style.setProperty('--duration', `${duration}s`);
+        item.style.setProperty('--scale', scale);
+        item.style.setProperty('--rot', `${rot}deg`);
+        item.style.fontSize = Math.random() * 10 + 20 + 'px';
+
+        spawnPoint.appendChild(item);
+        
+        // Hapus elemen setelah animasi selesai agar tidak berat
+        setTimeout(() => item.remove(), duration * 1000);
+      }, i * 50); // Delay sedikit per item agar munculnya bergantian
+    }
+  }
+
+  let step = 0;
+  const btn = document.getElementById("mainBtn");
+  const lid = document.getElementById("lid");
+  const photo = document.getElementById("photo");
+  const letter = document.getElementById("letterWrapper");
+
+  btn.onclick = () => {
+    step++;
+    if(step === 1) { 
+        lid.classList.add("open"); 
+        spawnItems(); // Panggil fungsi animasi balon & bunga
+        btn.innerText = "Lihat Foto"; 
+    }
+    else if(step === 2) { 
+        photo.classList.add("show"); 
+        btn.innerText = "Baca Pesan"; 
+    }
+    else if(step === 3) {
+      photo.classList.remove("show");
+      setTimeout(() => {
+        letter.classList.add("active"); 
+        btn.style.display = "none";
+      }, 400);
+    }
+  };
+
+  function openLetter() {
+    if(letter.classList.contains("active")) {
+        letter.classList.add("open");
+    }
+  }
+
+  document.getElementById("toVideo").onclick = (e) => {
+    e.stopPropagation();
+    document.getElementById("videoPage").style.display = "flex";
+    document.getElementById("vids").play();
+    music.pause();
+  };
+  
+  document.getElementById("backBtn").onclick = () => { location.reload(); };
+</script>
+
+</body>
+</html>
